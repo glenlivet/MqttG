@@ -1,9 +1,10 @@
-package org.glenn.mqtt.core;
+package org.glenn.mqtt.core.intertransport;
 
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.Vector;
 
+import org.glenn.mqtt.core.MqttSimpleClient;
 import org.glenn.mqtt.core.message.MqttAbstractMessage;
 
 /**

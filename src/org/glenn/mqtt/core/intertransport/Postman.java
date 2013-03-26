@@ -1,4 +1,4 @@
-package org.glenn.mqtt.core;
+package org.glenn.mqtt.core.intertransport;
 
 import org.glenn.mqtt.core.message.MqttAbstractMessage;
 

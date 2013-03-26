@@ -4,6 +4,11 @@ import java.io.IOException;
 
 import org.glenn.mqtt.core.comms.NetworkModule;
 import org.glenn.mqtt.core.comms.TCPNetworkModule;
+import org.glenn.mqtt.core.intertransport.InputPort;
+import org.glenn.mqtt.core.intertransport.Mailcar;
+import org.glenn.mqtt.core.intertransport.OutputPort;
+import org.glenn.mqtt.core.intertransport.PostOffice;
+import org.glenn.mqtt.core.intertransport.SimpleOutputPort;
 
 public class MqttContext extends Thread {
 	

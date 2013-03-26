@@ -2,6 +2,9 @@ package org.glenn.mqtt.core;
 
 import org.glenn.mqtt.core.exceptions.MqttConnectionRefusedException;
 import org.glenn.mqtt.core.exceptions.MqttUnknowReturnCodeException;
+import org.glenn.mqtt.core.intertransport.PostOffice;
+import org.glenn.mqtt.core.intertransport.Postable;
+import org.glenn.mqtt.core.intertransport.Postman;
 import org.glenn.mqtt.core.message.MqttAbstractMessage;
 import org.glenn.mqtt.core.message.MqttConnack;
 import org.glenn.mqtt.core.message.MqttConnect;
