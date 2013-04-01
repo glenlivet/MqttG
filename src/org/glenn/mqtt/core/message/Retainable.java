@@ -4,6 +4,6 @@ public interface Retainable {
 	
 	public abstract boolean isRetained();
 	
-	public abstract void setRetained();
+	public abstract void setRetained(boolean retained);
 
 }

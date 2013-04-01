@@ -1,6 +1,8 @@
 package org.glenn.mqtt.core;
 
 import org.glenn.mqtt.core.exceptions.MqttConnectionRefusedException;
+import org.glenn.mqtt.core.exceptions.MqttTopicException;
+import org.glenn.mqtt.core.exceptions.MqttUnacceptableQosException;
 import org.glenn.mqtt.core.exceptions.MqttUnknowReturnCodeException;
 import org.glenn.mqtt.core.intertransport.PostOffice;
 import org.glenn.mqtt.core.intertransport.Postable;
@@ -8,12 +10,13 @@ import org.glenn.mqtt.core.intertransport.Postman;
 import org.glenn.mqtt.core.message.MqttAbstractMessage;
 import org.glenn.mqtt.core.message.MqttConnack;
 import org.glenn.mqtt.core.message.MqttConnect;
+import org.glenn.mqtt.core.message.MqttMail;
+import org.glenn.mqtt.core.message.MqttPublish;
 import org.glenn.mqtt.core.protocal.MqttProtocalFixedHeader;
 import org.glenn.mqtt.core.protocal.MqttProtocalVariableHeader;
 
 public class MqttSimpleClient implements Postable {
 	
-	private String clientId;
 	
 	private MqttConnectOptions connOpts;
 	
@@ -23,15 +26,15 @@ public class MqttSimpleClient implements Postable {
 	
 	private boolean available = false;
 	
-	private MqttSimpleClient(String clientId, MqttConnectOptions connOpts, MqttContext context){
-		this.clientId = clientId;
+	private MqttSimpleClient(MqttConnectOptions connOpts, MqttContext context){
+		
 		this.connOpts = connOpts;
 		this.context  = context;
 	}
 	
-	public static synchronized MqttSimpleClient getInstance(String clientId, MqttConnectOptions connOpts, MqttContext context){
+	public static synchronized MqttSimpleClient getInstance(MqttConnectOptions connOpts, MqttContext context){
 		if(client == null){
-			client = new MqttSimpleClient(clientId, connOpts, context);
+			client = new MqttSimpleClient(connOpts, context);
 		}
 		return client;
 	}
@@ -82,7 +85,7 @@ public class MqttSimpleClient implements Postable {
 			//onPubComp((MqttPubComp)msg);
 			break;
 		case MqttProtocalFixedHeader.MSG_TYPE_PUBLISH:
-			//onPublish((MqttPublish)msg);
+			onPublish((MqttPublish)msg);
 			break;
 		case MqttProtocalFixedHeader.MSG_TYPE_PUBREC:
 			//onPubRec((MqttPubRec)msg);
@@ -100,6 +103,34 @@ public class MqttSimpleClient implements Postable {
 			//TODO: throw exception
 			break;
 		}
+		
+	}
+	
+	private void onPublish(MqttPublish msg){
+		try {
+			MqttMail mail = msg.getMqttMail();
+			byte _qos = msg.getQos();
+			switch (_qos) {
+			case 0x00:
+				context.mailEmitted(mail);
+				break;
+			case 0x01:
+				//发送puback
+				context.mailEmitted(mail);
+				break;
+			case 0x02:
+				//将MqttPublish缓存一下
+				
+				//发送pubrec
+				break;
+			}
+		} catch (MqttTopicException e) {
+			// TODO: handle exception
+		} catch (MqttUnacceptableQosException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		
 	}
 

@@ -7,10 +7,10 @@ public abstract class Duplicatable extends Identifiable{
 		// TODO Auto-generated constructor stub
 	}
 
-	private boolean duplicated = false;
+	protected boolean duplicated = false;
 	
-	public void setDup(){
-		this.duplicated = true;
+	public void setDup(boolean dup){
+		this.duplicated = dup;
 	}
 	
 	public boolean isDup(){

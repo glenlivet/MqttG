@@ -24,11 +24,14 @@ public class MessageParser {
 			dis.readFully(data, 0, data.length);
 		
 		switch(type){
-		case MqttProtocalFixedHeader.MSG_TYPE_CONNECT:
+		case MqttProtocalFixedHeader.MSG_TYPE_PUBLISH:
 			result = new MqttPublish(info, data);
 			break;
 		case MqttProtocalFixedHeader.MSG_TYPE_CONNACK:
 			result = new MqttConnack(info, data);
+			break;
+		case MqttProtocalFixedHeader.MSG_TYPE_SUBACK:
+			result = new MqttSubAck(info, data);
 			break;
 			/*
 		case MqttProtocalFixedHeader.MSG_TYPE_DISCONNECT:

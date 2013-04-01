@@ -24,6 +24,7 @@ public class MqttConnack extends MqttAck {
 		dis.readByte();
 		returnCode = (byte) dis.readUnsignedByte();
 		dis.close();
+		bais.close();
 
 	}
 	

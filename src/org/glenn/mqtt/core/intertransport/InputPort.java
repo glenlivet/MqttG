@@ -56,18 +56,18 @@ public class InputPort extends Thread implements Postable{
 	
 	@Override
 	public void run(){
-		while(true){
-			try {
+		
+		try {
+			while (true) {
 				this.listen();
-			} catch (MqttParsingException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				// TODO: ¹Ø±Õinputport
-				e.printStackTrace();
 			}
+		} catch (IOException e) {
+			// TODO: handle exception
+		} catch (MqttParsingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
+		
 	}
 	
 	protected void listen() throws MqttParsingException, IOException{
