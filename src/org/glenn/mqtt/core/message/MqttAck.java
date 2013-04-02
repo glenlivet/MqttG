@@ -1,6 +1,6 @@
 package org.glenn.mqtt.core.message;
 
-public abstract class MqttAck extends MqttAbstractMessage{
+public abstract class MqttAck extends Identifiable{
 	
 	
 	public MqttAck(byte type) {

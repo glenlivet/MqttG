@@ -4,6 +4,7 @@ import org.glenn.mqtt.core.exceptions.MqttConnectionRefusedException;
 import org.glenn.mqtt.core.exceptions.MqttTopicException;
 import org.glenn.mqtt.core.exceptions.MqttUnacceptableQosException;
 import org.glenn.mqtt.core.exceptions.MqttUnknowReturnCodeException;
+import org.glenn.mqtt.core.exceptions.NetworkUnavailableException;
 import org.glenn.mqtt.core.intertransport.PostOffice;
 import org.glenn.mqtt.core.intertransport.Postable;
 import org.glenn.mqtt.core.intertransport.Postman;
@@ -11,6 +12,7 @@ import org.glenn.mqtt.core.message.MqttAbstractMessage;
 import org.glenn.mqtt.core.message.MqttConnack;
 import org.glenn.mqtt.core.message.MqttConnect;
 import org.glenn.mqtt.core.message.MqttMail;
+import org.glenn.mqtt.core.message.MqttPubAck;
 import org.glenn.mqtt.core.message.MqttPublish;
 import org.glenn.mqtt.core.protocal.MqttProtocalFixedHeader;
 import org.glenn.mqtt.core.protocal.MqttProtocalVariableHeader;
@@ -46,7 +48,7 @@ public class MqttSimpleClient implements Postable {
 		return client;
 	} 
 	
-	public void active(){
+	public void active() throws NetworkUnavailableException{
 		MqttConnect connMsg = new MqttConnect(connOpts);
 		this.post(connMsg);
 	}
@@ -56,10 +58,14 @@ public class MqttSimpleClient implements Postable {
 	 * 
 	 * @param msg
 	 */
-	public void post(MqttAbstractMessage msg){
+	public void post(MqttAbstractMessage msg) throws NetworkUnavailableException{
 		PostOffice po = PostOffice.getInstance();
-		Postman pm = new Postman(this, po, msg);
-		pm.work();
+		if(po.isOpen()){
+			Postman pm = new Postman(this, po, msg);
+			pm.work();
+		}else{
+			throw new NetworkUnavailableException();
+		}
 	}
 
 	@Override
@@ -79,7 +85,7 @@ public class MqttSimpleClient implements Postable {
 			//onPingResp((MqttPingResp)msg);
 			break;
 		case MqttProtocalFixedHeader.MSG_TYPE_PUBACK:
-			//onPubAck((MqttPubAck)msg);
+			onPubAck((MqttPubAck)msg);
 			break;
 		case MqttProtocalFixedHeader.MSG_TYPE_PUBCOMP:
 			//onPubComp((MqttPubComp)msg);
@@ -106,6 +112,11 @@ public class MqttSimpleClient implements Postable {
 		
 	}
 	
+	private void onPubAck(MqttPubAck msg){
+		context.onPubAck(msg.getMessageId());
+		
+	}
+	
 	private void onPublish(MqttPublish msg){
 		try {
 			MqttMail mail = msg.getMqttMail();
@@ -116,6 +127,13 @@ public class MqttSimpleClient implements Postable {
 				break;
 			case 0x01:
 				//·¢ËÍpuback
+				MqttPubAck puback = new MqttPubAck(msg);
+				try {
+					this.post(puback);
+				} catch (NetworkUnavailableException e) {
+					// TODO Auto-generated catch block
+					//
+				}
 				context.mailEmitted(mail);
 				break;
 			case 0x02:
@@ -135,8 +153,9 @@ public class MqttSimpleClient implements Postable {
 	}
 
 	private void onConnack(MqttConnack msg) {
+		byte returnCode = msg.getReturnCode();
 		try {
-			byte returnCode = msg.getReturnCode();
+			
 			if (returnCode == MqttProtocalVariableHeader.CONNECT_RETURN_CODE_ACCEPTED) {
 				this.available = true;
 				context.connectedCallback();
@@ -146,9 +165,10 @@ public class MqttSimpleClient implements Postable {
 			}
 		} catch (MqttConnectionRefusedException e) {
 			// TODO: handle exception
-			context.connectionFailed();
+			context.connectionFailed(ConnectionFailureHandler.MQTTCONNECTION_REFULSED, returnCode);
 		} catch (MqttUnknowReturnCodeException e) {
 			// TODO Auto-generated catch block
+			//Vital one
 			e.printStackTrace();
 		}
 	}

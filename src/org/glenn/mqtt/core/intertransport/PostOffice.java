@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.Vector;
 
+import org.glenn.mqtt.core.ConnectionFailureHandler;
+import org.glenn.mqtt.core.MqttContext;
 import org.glenn.mqtt.core.MqttSimpleClient;
 import org.glenn.mqtt.core.message.MqttAbstractMessage;
 
@@ -28,6 +30,8 @@ public class PostOffice implements Postable{
 	//当抛出IOException的时候，需要关闭邮箱
 	//当重连成功后，可以再开启
 	private boolean open;
+	
+	private boolean established = false;
 	
 	private static PostOffice postOffice;
 	
@@ -78,6 +82,10 @@ public class PostOffice implements Postable{
 	}
 	
 	
+	public boolean isOpen(){
+		return this.open;
+	}
+	
 	/**
 	 * 获取邮局对象后，要使其开张才能营业。
 	 * 
@@ -86,6 +94,11 @@ public class PostOffice implements Postable{
 		this.toDeliverBox.start();
 		this.onReceivedBox.start();
 		this.open = true;
+		this.established = true;
+	}
+	
+	public boolean isEstablished(){
+		return this.established;
 	}
 	
 	public void open(){
@@ -145,6 +158,24 @@ public class PostOffice implements Postable{
 					}catch(InterruptedException e){
 						// TODO Auto-generated catch block
 						e.printStackTrace(); 
+					} catch (IOException e) {
+						if (PostOffice.this.isOpen()) {
+							// TODO Auto-generated catch block
+							//write IOException
+							//关闭postoffice
+							PostOffice.this.close();
+							//关闭inputport
+							InputPort ipp = InputPort.getInstance();
+							ipp.close();
+							//关闭outputport
+							OutputPort opp = SimpleOutputPort.getInstance();
+							opp.close();
+							//调用context#callback
+							MqttContext context = MqttContext.getInstance();
+							context.connectionFailed(ConnectionFailureHandler.OUTPUTSTREAM_CLOSED);
+							e.printStackTrace();
+						}
+						
 					}
 				}
 			}

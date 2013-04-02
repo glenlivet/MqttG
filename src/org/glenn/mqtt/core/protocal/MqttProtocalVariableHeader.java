@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
+
 public class MqttProtocalVariableHeader {
 	
 	public final static String PROTOCAL_NAME_STRING = "MQIsdp";
@@ -43,5 +44,16 @@ public class MqttProtocalVariableHeader {
 		
 	}
 	*/
+	
+	public static byte[] encodeMessageId(int msgId) throws IOException {
+	
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		DataOutputStream dos = new DataOutputStream(baos);
+		dos.writeShort(msgId);
+		dos.flush();
+		return baos.toByteArray();
+	
+		
+	}
 	
 }

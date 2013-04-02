@@ -36,12 +36,9 @@ public class Mailcar implements Transporter {
 	}
 
 	@Override
-	public void deliver(MqttAbstractMessage msg) {
-		try{
+	public void deliver(MqttAbstractMessage msg) throws IOException {
 		this.op.outport(msg);
-		}catch(IOException e){
-			//TODO 
-		}
+		
 	}
 
 }

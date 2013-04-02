@@ -66,7 +66,8 @@ public class SimpleOutputPort implements OutputPort {
 	@Override
 	public void outport(MqttAbstractMessage msg) throws IOException {
 		if(!this.isAvailable()){
-			//TODO: Å×³öÒì³£
+			//
+			return;
 		}
 		DataOutputStream dos = new DataOutputStream(out);
 		dos.write(msg.getBytes());

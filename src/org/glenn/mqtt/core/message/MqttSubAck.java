@@ -8,8 +8,6 @@ import org.glenn.mqtt.core.protocal.MqttProtocalFixedHeader;
 
 public class MqttSubAck extends MqttAck {
 	
-	private int messageId;
-	
 	private byte[] grantedQos;
 	
 	public MqttSubAck(byte info, byte[] data) throws IOException{

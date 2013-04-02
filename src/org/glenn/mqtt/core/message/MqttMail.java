@@ -17,7 +17,7 @@ public class MqttMail {
 	private MqttTopic topic;
 	private byte qos = 1;
 	private boolean retained = false;
-	private int messageId;
+	private int messageId = 0;
 	private boolean dup = false;
 	
 	public int hashCode(){

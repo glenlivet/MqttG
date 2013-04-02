@@ -1,5 +1,7 @@
 package org.glenn.mqtt.core.intertransport;
 
+import java.io.IOException;
+
 import org.glenn.mqtt.core.message.MqttAbstractMessage;
 /**
  * 和邮局PostOffice类进行交互。包括，从客户Client处将邮件传输给邮局PostOffice,
@@ -10,5 +12,5 @@ import org.glenn.mqtt.core.message.MqttAbstractMessage;
  *
  */
 public interface Transporter {
-	public abstract void deliver(MqttAbstractMessage msg);
+	public abstract void deliver(MqttAbstractMessage msg) throws IOException;
 }

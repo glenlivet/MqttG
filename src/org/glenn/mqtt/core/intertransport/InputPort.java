@@ -3,6 +3,8 @@ package org.glenn.mqtt.core.intertransport;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.glenn.mqtt.core.ConnectionFailureHandler;
+import org.glenn.mqtt.core.MqttContext;
 import org.glenn.mqtt.core.exceptions.MqttParsingException;
 import org.glenn.mqtt.core.message.MessageParser;
 import org.glenn.mqtt.core.message.MqttAbstractMessage;
@@ -17,6 +19,14 @@ public class InputPort extends Thread implements Postable{
 	private InputPort(InputStream ins){
 		this.ins = ins;
 		this.available = true;
+	}
+	
+	public static InputPort getInstance(){
+		if(inp == null){
+			//throw exception
+			//vital one
+		}
+		return inp;
 	}
 	
 	public static InputPort getInstance(InputStream ins){
@@ -56,25 +66,50 @@ public class InputPort extends Thread implements Postable{
 	
 	@Override
 	public void run(){
-		
-		try {
-			while (true) {
+		while (true) {
+			if(this.available)
 				this.listen();
-			}
-		} catch (IOException e) {
-			// TODO: handle exception
-		} catch (MqttParsingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			else
+				try {
+					sleep(1000);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			
 		}
+			
+		
 		
 	}
 	
-	protected void listen() throws MqttParsingException, IOException{
-		MqttAbstractMessage msg = MessageParser.parse(this.ins);
-		PostOffice office = PostOffice.getInstance();
-		Postman pm = new Postman(this, office);
-		pm.deliver(msg);
+	protected void listen(){
+		try {
+			MqttAbstractMessage msg = MessageParser.parse(this.ins);
+			PostOffice office = PostOffice.getInstance();
+			Postman pm = new Postman(this, office);
+			pm.deliver(msg);
+		} catch (IOException e) {
+			//read IOException
+			//关闭postoffice
+			PostOffice po = PostOffice.getInstance();
+			if (po.isOpen()) {
+				po.close();
+				//关闭inputport
+				this.close();
+				//关闭outputport
+				OutputPort opp = SimpleOutputPort.getInstance();
+				opp.close();
+				//调用context#callback
+				MqttContext context = MqttContext.getInstance();
+				context.connectionFailed(ConnectionFailureHandler.INPUTSTREAM_CLOSED);
+				e.printStackTrace();
+			}
+			
+		} catch (MqttParsingException e) {
+			// Vital one 
+			e.printStackTrace();
+		}
 	}
 	
 	//应该不会被用到
