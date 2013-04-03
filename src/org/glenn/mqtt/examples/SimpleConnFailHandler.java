@@ -6,19 +6,19 @@ public class SimpleConnFailHandler implements ConnectionFailureHandler {
 
 	@Override
 	public void handleNormailIOException() {
-		// TODO Auto-generated method stub
+		System.out.println("NormailIOException£¡Probably caused by disconnection from server.");
 
 	}
 
 	@Override
 	public void handleMqttConnectionRefulsed(byte returnCode) {
-		// TODO Auto-generated method stub
+		System.out.println("MqttConnectionRefulsed!");
 
 	}
 
 	@Override
 	public void handleMqttContextInitFailure() {
-		// TODO Auto-generated method stub
+		System.out.println("MqttContextInitFailure");
 
 	}
 

@@ -5,6 +5,7 @@ import java.io.InputStream;
 
 import org.glenn.mqtt.core.ConnectionFailureHandler;
 import org.glenn.mqtt.core.MqttContext;
+import org.glenn.mqtt.core.MqttSimpleClient;
 import org.glenn.mqtt.core.exceptions.MqttParsingException;
 import org.glenn.mqtt.core.message.MessageParser;
 import org.glenn.mqtt.core.message.MqttAbstractMessage;
@@ -90,7 +91,10 @@ public class InputPort extends Thread implements Postable{
 			Postman pm = new Postman(this, office);
 			pm.deliver(msg);
 		} catch (IOException e) {
-			//read IOException
+			System.out.println("IOException");
+			//清空mqttclient中的publishPostman
+			MqttSimpleClient client = MqttSimpleClient.getInstance();
+			client.removeAllPublishPostman();
 			//关闭postoffice
 			PostOffice po = PostOffice.getInstance();
 			if (po.isOpen()) {

@@ -1,5 +1,9 @@
 package org.glenn.mqtt.core;
 
+import java.util.HashMap;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+
 import org.glenn.mqtt.core.exceptions.MqttConnectionRefusedException;
 import org.glenn.mqtt.core.exceptions.MqttTopicException;
 import org.glenn.mqtt.core.exceptions.MqttUnacceptableQosException;
@@ -27,6 +31,8 @@ public class MqttSimpleClient implements Postable {
 	private static MqttSimpleClient client;
 	
 	private boolean available = false;
+	
+	public ConcurrentHashMap<Integer, Postman> publishPostman = new ConcurrentHashMap<Integer, Postman>();
 	
 	private MqttSimpleClient(MqttConnectOptions connOpts, MqttContext context){
 		
@@ -62,6 +68,11 @@ public class MqttSimpleClient implements Postable {
 		PostOffice po = PostOffice.getInstance();
 		if(po.isOpen()){
 			Postman pm = new Postman(this, po, msg);
+			//如果是qos>0的publish 则需要设置重发
+			if(msg instanceof MqttPublish && ((MqttPublish)msg).getQos() > 0){
+				pm.setResend((short)5);
+				publishPostman.put(Integer.valueOf(((MqttPublish)msg).getMessageId()), pm);
+			}
 			pm.work();
 		}else{
 			throw new NetworkUnavailableException();
@@ -112,7 +123,24 @@ public class MqttSimpleClient implements Postable {
 		
 	}
 	
+	private void removePublishPostman(Integer integer){
+		Postman pm = publishPostman.get(integer);
+		if(pm != null){
+			pm.stopSend();
+			publishPostman.remove(integer);
+		}
+	}
+	
+	public void removeAllPublishPostman(){
+		Set<Integer> keys = publishPostman.keySet();
+		for(Integer key : keys){
+			removePublishPostman(key);
+		}
+	}
+	
 	private void onPubAck(MqttPubAck msg){
+		Integer integer = Integer.valueOf(msg.getMessageId());
+		removePublishPostman(integer);
 		context.onPubAck(msg.getMessageId());
 		
 	}

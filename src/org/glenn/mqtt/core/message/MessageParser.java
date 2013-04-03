@@ -33,6 +33,9 @@ public class MessageParser {
 		case MqttProtocalFixedHeader.MSG_TYPE_SUBACK:
 			result = new MqttSubAck(info, data);
 			break;
+		case MqttProtocalFixedHeader.MSG_TYPE_PUBACK:
+			result = new MqttPubAck(info, data);
+			break;
 			/*
 		case MqttProtocalFixedHeader.MSG_TYPE_DISCONNECT:
 			result = new MqttDisconnect(info, data);
@@ -43,9 +46,7 @@ public class MessageParser {
 		case MqttProtocalFixedHeader.MSG_TYPE_PINGRESP:
 			result = new MqttPingResp(info, data);
 			break;
-		case MqttProtocalFixedHeader.MSG_TYPE_PUBACK:
-			result = new MqttPubAck(info, data);
-			break;
+		
 		case MqttProtocalFixedHeader.MSG_TYPE_PUBCOMP:
 			result = new MqttBupComp(info, data);
 			break;

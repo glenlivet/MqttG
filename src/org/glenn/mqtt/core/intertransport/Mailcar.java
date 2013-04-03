@@ -3,6 +3,8 @@ package org.glenn.mqtt.core.intertransport;
 import java.io.IOException;
 
 import org.glenn.mqtt.core.message.MqttAbstractMessage;
+import org.glenn.mqtt.core.message.MqttConnect;
+import org.glenn.mqtt.core.message.MqttPublish;
 
 
 /**
@@ -38,7 +40,6 @@ public class Mailcar implements Transporter {
 	@Override
 	public void deliver(MqttAbstractMessage msg) throws IOException {
 		this.op.outport(msg);
-		
 	}
 
 }

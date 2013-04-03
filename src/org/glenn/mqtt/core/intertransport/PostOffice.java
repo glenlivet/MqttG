@@ -8,6 +8,7 @@ import org.glenn.mqtt.core.ConnectionFailureHandler;
 import org.glenn.mqtt.core.MqttContext;
 import org.glenn.mqtt.core.MqttSimpleClient;
 import org.glenn.mqtt.core.message.MqttAbstractMessage;
+import org.glenn.mqtt.core.message.MqttPublish;
 
 /**
  * 邮局类，保存两个消息队列，一个等待被写入outputstream,另一个
@@ -162,6 +163,9 @@ public class PostOffice implements Postable{
 						if (PostOffice.this.isOpen()) {
 							// TODO Auto-generated catch block
 							//write IOException
+							//清空mqttclient中的publishPostman
+							MqttSimpleClient client = MqttSimpleClient.getInstance();
+							client.removeAllPublishPostman();
 							//关闭postoffice
 							PostOffice.this.close();
 							//关闭inputport
