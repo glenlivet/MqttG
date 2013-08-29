@@ -47,7 +47,7 @@ public class SimpleWorkspace implements MqttWorkspace {
 			
 			byte[] payload = content.getBytes("UTF-8");
 			MqttMail _mail = new MqttMail(topic, payload);
-			_mail.setQos((byte) 1);
+			_mail.setQos((byte) 0);
 			context.sendMail(_mail);
 			Thread.sleep(200);
 			topic = topicFac.createTopic("_BROKER_/_INIT_/_CACHED_MSG_");
@@ -55,8 +55,9 @@ public class SimpleWorkspace implements MqttWorkspace {
 			
 			byte[] _pl = content.getBytes("UTF-8");
 			MqttMail __mail = new MqttMail(topic, _pl);
-			__mail.setQos((byte) 1);
+			__mail.setQos((byte) 0);
 			context.sendMail(__mail);
+			
 			
 		} catch (MqttTopicException e) {
 			// TODO: handle exception
@@ -75,7 +76,7 @@ public class SimpleWorkspace implements MqttWorkspace {
 		MqttConnectOptions connOpts = new MqttConnectOptions("MCXXX00", "MessageCentre", password.toCharArray(), 20);
 		SimpleWorkspace workspace = new SimpleWorkspace();
 		SimpleConnFailHandler mConnHandler = new SimpleConnFailHandler();
-		workspace.context = MqttContext.getInstance("128.128.4.70", 10808, connOpts, workspace, mConnHandler);
+		workspace.context = MqttContext.getInstance("128.128.4.70", 11818, connOpts, workspace, mConnHandler);
 		workspace.context.start();
 	}
 
